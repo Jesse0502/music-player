@@ -6,6 +6,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { Box, Text } from "@mantine/core";
+import MusicPlayer from "../components/MusicPlayer";
 
 const Profile: React.FC = () => {
   return (

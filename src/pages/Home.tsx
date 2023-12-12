@@ -2,7 +2,10 @@ import {
   IonAlert,
   IonContent,
   IonHeader,
+  IonImg,
   IonPage,
+  IonRouterLink,
+  IonTabButton,
   IonTitle,
   IonToolbar,
   useIonRouter,
@@ -15,7 +18,9 @@ import {
   Drawer,
   Flex,
   Image,
+  NavLink,
   ScrollArea,
+  Switch,
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,115 +29,205 @@ import {
   SPOTIFY_AUTH_URL,
   SPOTIFY_CLIENT_ID,
   SPOTIFY_LOGIN_CODE,
+  darkThemebg,
+  gaySingerList,
+  reccomendations,
+  topTrackReccomendations,
 } from "../constants";
-import SpotifyPlayer from "react-spotify-web-playback";
+import HomeHeader from "../components/Home/Header";
+import MusicPlayer from "../components/MusicPlayer";
+import { Router } from "react-router";
 
 const Home: React.FC = () => {
-  const [opened, { toggle }] = useDisclosure();
-  const [play, setPlay] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [refreshToken, setRefreshToken] = useState(
-    "AQCuLRfmB5mqn0-NjJxzRcVYbx0Dptrtya8tqFIalBX2R5OKOFh4S0-eDUBLO0zvqcmtLZr0Up-KVGK9NtP4gm12KHaPVuD5nD5xW7z-J8FPkx6wjQzXqzcGZw7pISPh71U"
-  );
-  const [accessToken, setAccessToken] = useState(
-    "BQD2N-xMjx9qazTah-uEzk7p4dLHg-o1Vg65aNnHiZMqIdUPNOjbtoM5bL6nhNXKedrHpbIyG9joSyYtl_jgukh0Hlpy2_33c8oDQn34TEqDWAKhaWnxebSY5DxI_TLcWsHiH24-mtUUCRpjPT1TI3lluymJfx69H-CI9joEOErW9F8iXjUdKsIvyhJ92IsN_IjyTg-7n8_eXUGIYMR7riN84gZNyxl2n6M9gVjKxKZh9HAE2peh"
-  );
+  const [list, setList] = useState(reccomendations.content.items);
+  const [gayFilter, setGayFilter] = useState<boolean | undefined>(false);
   useEffect(() => {
-    const interval = setInterval(async () => {
-      if (!isRefreshing) {
-        setIsRefreshing(true);
-        try {
-          const response = await fetch(
-            "https://01c0-2401-4900-80a3-b0df-3900-ed37-3c8b-e630.ngrok-free.app/refresh",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                refreshToken,
-              }),
-            }
-          );
-          const data = await response.json();
-          setAccessToken(data.accessToken); // Update the state with the new access token
-          setIsRefreshing(false);
-        } catch (error) {
-          console.error(error);
-          setIsRefreshing(false);
-        }
-      }
-    }, 360000); // 3600000 milliseconds in 1 hour
+    (async () => {
+      const url =
+        "https://spotify23.p.rapidapi.com/genre_view/?id=0JQ5DAqbMKFEC4WFtoNRpw&content_limit=10&limit=10";
+      const options = {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key":
+            "7c32b94251mshcddfc80855224dfp14b29ajsn2f1b6a3b5141",
+          "X-RapidAPI-Host": "spotify23.p.rapidapi.com",
+        },
+      };
 
-    return () => clearInterval(interval);
-  }, [refreshToken]); // On
+      try {
+        // const response = await fetch(url, options);
+        // const result = await response.text();
+        // setList(result.content.items);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
+
+  const [contentOpacity, setContentOpacity] = useState(1);
+  const [isHovered, setIsHovered] = useState("");
+  const toggleGayFilter = (val: boolean) => {
+    setGayFilter(val);
+    let flickerOpacityValues = [1, 0.8, 0.6, 0.4, 0.2, 0.1, 0.2, 0.4, 0.6, 0.9];
+    let flickerOpacityIndex = 0;
+    let flickerInterval: any;
+
+    function flickerSwitch() {
+      if (flickerOpacityIndex >= flickerOpacityValues.length) {
+        flickerOpacityIndex = 0;
+      }
+
+      setContentOpacity(flickerOpacityValues[flickerOpacityIndex]);
+      flickerOpacityIndex++;
+
+      if (flickerOpacityIndex >= 10) {
+        // Stop after 5 iterations
+        clearInterval(flickerInterval);
+        setContentOpacity(1);
+      }
+    }
+
+    flickerInterval = setInterval(flickerSwitch, 50);
+  };
+
+  const router = useIonRouter();
   return (
     <IonPage>
-      <IonHeader style={{ backgroundColor: "black" }}>
-        <IonToolbar style={{ backgroundColor: "black" }}>
-          <Flex
-            pos={"static"}
-            h="50px"
-            bg="#242424"
-            align={"center"}
-            // px="-10px"
-          >
-            <Drawer
-              opened={opened}
-              onClose={toggle}
-              size={"xs"}
-              title={<Text>Menu</Text>}
-            ></Drawer>
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              aria-label="Toggle navigation"
-            />
-          </Flex>
-          {/* <IonTitle>Header</IonTitle> */}
-        </IonToolbar>
-      </IonHeader>
       <IonContent fullscreen>
-        <Box h="100%">
-          <Center h="100vh" bg="#242424">
-            <Button
-              size="xl"
-              color="green"
-              onClick={() => window.open(SPOTIFY_AUTH_URL, "_system")}
-            >
-              Login With Spotify
-            </Button>
-          </Center>
-          <Image
-            src={
-              "https://eu-images.contentstack.com/v3/assets/blt6b0f74e5591baa03/blt8025f5a4bfcf840a/64c073ea83c49ef1bcb64cf9/AI_Text_Classifier_(1).png"
-            }
-          />
-        </Box>
-        <SpotifyPlayer
-          token={accessToken}
-          // layout="responsive"
-          showSaveIcon
-          locale={{}}
-          play={play}
-          styles={{
-            activeColor: "#ff4961",
-            bgColor: "#242424",
-            // height: 50,
-            color: "#ff4961",
-            sliderHeight: 2,
-            trackArtistColor: "#fff",
-            trackNameColor: "#fff",
+        <Box
+          pos="relative"
+          style={{
+            backgroundColor: darkThemebg,
           }}
-          hideAttribution
-          name=""
-          uris={[
-            "spotify:track:4cxMGhkinTocPSVVKWIw0d",
-            "spotify:track:1KMkcUvF7m3SDChDOa7i5L",
-            "spotify:track:4sx6NRwL6Ol3V6m9exwGlQ",
-            "spotify:track:1r8ZCjfrQxoy2wVaBUbpwg",
-          ]}
-        />
+        >
+          <HomeHeader />
+          <Box
+            style={{
+              minHeight: "100vh",
+              overflow: "hidden",
+              paddingBottom: "150px",
+              backgroundColor: darkThemebg,
+            }}
+            bg={darkThemebg}
+          >
+            <Flex align="center" gap={"sm"} justify={"end"} px="lg">
+              <Text style={{ color: "white" }}>Gay Filter</Text>
+              <Switch
+                defaultChecked={gayFilter}
+                onChange={(e) => {
+                  toggleGayFilter(e.target.checked);
+                }}
+              />
+            </Flex>
+            <Box
+              style={{
+                opacity: contentOpacity,
+              }}
+            >
+              <Text
+                pl="xl"
+                pt="xl"
+                fw={"bold"}
+                style={{ color: "white", fontSize: "25px" }}
+              >
+                Trending Playlists
+              </Text>
+              <ScrollArea scrollbars="x" scrollbarSize={"0"}>
+                <Flex
+                  gap={"lg"}
+                  style={{ overflowX: "auto", overflowY: "clip" }}
+                  mt="lg"
+                  px="xl"
+                >
+                  {list.map((i) => (
+                    <IonTabButton
+                      href={"/playlist/" + i?.content?.items[0]?.id}
+                    >
+                      <Box
+                        display={i?.content?.items[0]?.uri ? "block" : "none"}
+                        h="max"
+                        w="200"
+                      >
+                        <IonImg
+                          onMouseLeave={() => {
+                            setIsHovered("");
+                          }}
+                          onMouseEnter={() => {
+                            setIsHovered(i.id);
+                          }}
+                          // onClick={() => {
+                          //   router.push("/playlist/" + i?.content?.items[0]?.id);
+                          // }}
+                          style={{
+                            height: "200px",
+                            width: "200px",
+                            transition: "transform 0.2s ease-in-out",
+                            transform:
+                              isHovered === i.id ? "scale(1.1)" : "scale(1)",
+                          }}
+                          src={
+                            i.images[0]?.url ?? i.content.items[0].images[0].url
+                          }
+                        />
+                        {/* <Text>{i?.content?.items[0]?.uri}</Text> */}
+                      </Box>
+                    </IonTabButton>
+                  ))}
+                </Flex>
+              </ScrollArea>
+              <Text
+                pl="xl"
+                pt="xl"
+                fw={"bold"}
+                style={{ color: "white", fontSize: "25px" }}
+              >
+                Top Songs
+              </Text>
+              <ScrollArea mt="lg" scrollbars="x" scrollbarSize={"0"}>
+                <Flex
+                  direction="row"
+                  wrap={"wrap"}
+                  px="md"
+                  gap={16}
+                  style={{
+                    width: "1290px",
+                    margin: "0 auto",
+                  }}
+                >
+                  {topTrackReccomendations.tracks.map((t, index) => (
+                    <Flex component="div" gap={"md"} w="300px">
+                      <Image h="60" w="60" src={t.album.images[0].url} />
+                      <Box style={{ color: "white", width: "300px" }}>
+                        <Text
+                          style={{
+                            width: "300px",
+                            fontSize: "18px",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "wrap",
+                            overflow: "hidden",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                          }}
+                        >
+                          {t.album.name}
+                        </Text>
+                        <Flex gap={"sm"}>
+                          <Text style={{ fontSize: "14px", opacity: 0.3 }}>
+                            {t.artists[0].name}
+                          </Text>
+                        </Flex>
+                      </Box>
+                    </Flex>
+                  ))}
+                </Flex>
+              </ScrollArea>
+            </Box>
+          </Box>
+
+          {/* <Box pos="sticky" bottom={0} h="max" w="full" bg="white">
+            <MusicPlayer />
+          </Box> */}
+        </Box>
       </IonContent>
     </IonPage>
   );

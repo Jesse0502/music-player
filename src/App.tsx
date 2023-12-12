@@ -47,7 +47,7 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "@mantine/core/styles.css";
-import { MantineProvider, Text, createTheme } from "@mantine/core";
+import { Box, MantineProvider, Text, createTheme } from "@mantine/core";
 import Routes from "./components/Routes";
 import AppHeader from "./components/AppHeader";
 
