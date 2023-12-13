@@ -24,7 +24,7 @@ const SingleTrack = ({ trackData }: { trackData: any }) => {
       <Box style={{ color: "white", paddingLeft: "10px" }}>
         <Text style={{ fontSize: "18px" }}>{trackData.track.album.name}</Text>
         <Flex gap={5}>
-          {trackData.track.album.artists.map((a, i, total) => (
+          {trackData.track.album.artists.map((a: any, i: any, total: any) => (
             <>
               <Text style={{ fontSize: "14px", opacity: 0.5 }}>
                 {a.name}
