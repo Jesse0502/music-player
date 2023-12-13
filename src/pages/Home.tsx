@@ -29,6 +29,7 @@ import {
   SPOTIFY_AUTH_URL,
   SPOTIFY_CLIENT_ID,
   SPOTIFY_LOGIN_CODE,
+  brandColor,
   darkThemebg,
   gaySingerList,
   reccomendations,
@@ -91,24 +92,26 @@ const Home: React.FC = () => {
   };
 
   const router = useIonRouter();
+
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen onIonScrollStart={() => console.log("scrolling")}>
         <Box
           pos="relative"
           style={{
-            backgroundColor: darkThemebg,
+            backgroundImage: darkThemebg,
           }}
         >
           <HomeHeader />
           <Box
+            // onScroll={(e) => console.log(e.cli)}
             style={{
               minHeight: "100vh",
               overflow: "hidden",
+              paddingTop: "10px",
               paddingBottom: "150px",
-              backgroundColor: darkThemebg,
+              backgroundImage: `linear-gradient(180deg, ${brandColor},${darkThemebg},${darkThemebg})`,
             }}
-            bg={darkThemebg}
           >
             <Flex align="center" gap={"sm"} justify={"end"} px="lg">
               <Text style={{ color: "white" }}>Gay Filter</Text>
@@ -136,42 +139,45 @@ const Home: React.FC = () => {
                 <Flex
                   gap={"lg"}
                   style={{ overflowX: "auto", overflowY: "clip" }}
-                  mt="lg"
+                  // mt="lg"
                   px="xl"
+                  h="300px"
+                  align={"center"}
                 >
                   {list.map((i) => (
-                    <IonTabButton
-                      href={"/playlist/" + i?.content?.items[0]?.id}
+                    <Box
+                      display={i?.content?.items[0]?.uri ? "block" : "none"}
+                      h="max"
+                      onClick={() => {
+                        router.push("/playlist/" + i?.content?.items[0]?.id);
+                      }}
                     >
-                      <Box
-                        display={i?.content?.items[0]?.uri ? "block" : "none"}
-                        h="max"
-                        w="200"
-                      >
-                        <IonImg
-                          onMouseLeave={() => {
-                            setIsHovered("");
-                          }}
-                          onMouseEnter={() => {
-                            setIsHovered(i.id);
-                          }}
-                          // onClick={() => {
-                          //   router.push("/playlist/" + i?.content?.items[0]?.id);
-                          // }}
-                          style={{
-                            height: "200px",
-                            width: "200px",
-                            transition: "transform 0.2s ease-in-out",
-                            transform:
-                              isHovered === i.id ? "scale(1.1)" : "scale(1)",
-                          }}
-                          src={
-                            i.images[0]?.url ?? i.content.items[0].images[0].url
-                          }
-                        />
-                        {/* <Text>{i?.content?.items[0]?.uri}</Text> */}
-                      </Box>
-                    </IonTabButton>
+                      <IonImg
+                        onMouseLeave={() => {
+                          setIsHovered("");
+                        }}
+                        onMouseEnter={() => {
+                          setIsHovered(i.id);
+                        }}
+                        // onClick={() => {
+                        //   router.push("/playlist/" + i?.content?.items[0]?.id);
+                        // }}
+                        style={{
+                          height: "230px",
+                          width: "230px",
+                          borderRadius: "10px",
+                          transition: "transform 0.2s ease-in-out",
+                          transform:
+                            isHovered === i.id ? "scale(1.2)" : "scale(1)",
+                          boxShadow: "2px 4px 5px rgba(0,0,0,0.55)",
+                          cursor: "pointer",
+                        }}
+                        src={
+                          i.images[0]?.url ?? i.content.items[0].images[0].url
+                        }
+                      />
+                      {/* <Text>{i?.content?.items[0]?.uri}</Text> */}
+                    </Box>
                   ))}
                 </Flex>
               </ScrollArea>
@@ -195,26 +201,61 @@ const Home: React.FC = () => {
                   }}
                 >
                   {topTrackReccomendations.tracks.map((t, index) => (
-                    <Flex component="div" gap={"md"} w="300px">
+                    <Flex
+                      component="div"
+                      gap={"md"}
+                      w="300px"
+                      opacity={
+                        t.artists.some((i) => gaySingerList.includes(i.name))
+                          ? 0.25
+                          : 1
+                      }
+                    >
                       <Image h="60" w="60" src={t.album.images[0].url} />
                       <Box style={{ color: "white", width: "300px" }}>
                         <Text
+                          lineClamp={1}
                           style={{
-                            width: "300px",
+                            width: "200px",
                             fontSize: "18px",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "wrap",
-                            overflow: "hidden",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
                           }}
                         >
                           {t.album.name}
                         </Text>
-                        <Flex gap={"sm"}>
-                          <Text style={{ fontSize: "14px", opacity: 0.3 }}>
+                        <Flex>
+                          {/* {t.artists.map((a, i) => ( */}
+                          <Text
+                            style={{
+                              fontSize: "14px",
+                              opacity: 0.3,
+                              marginRight: "5px",
+                            }}
+                          >
                             {t.artists[0].name}
+                            {t.artists.length > 1 && ","}
                           </Text>
+                          {t.artists.length > 1 && (
+                            <>
+                              <Text
+                                style={{
+                                  fontSize: "14px",
+                                  opacity: 0.3,
+                                  marginRight: "4px",
+                                }}
+                              >
+                                {t.artists[1].name}
+                                {t.artists.length > 3 && ","}
+                              </Text>
+                            </>
+                          )}
+                          {t.artists.length > 3 && (
+                            <>
+                              <Text style={{ fontSize: "14px", opacity: 0.3 }}>
+                                ({t.artists.length - 2} more)
+                              </Text>
+                            </>
+                          )}
+                          {/* ))} */}
                         </Flex>
                       </Box>
                     </Flex>

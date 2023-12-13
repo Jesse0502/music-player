@@ -1,4 +1,4 @@
-import { IonHeader, IonIcon, IonToolbar } from "@ionic/react";
+import { IonHeader, IonIcon, IonToolbar, useIonRouter } from "@ionic/react";
 import { Avatar, Burger, Drawer, Flex, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { brandColor, darkThemebg } from "../../constants";
@@ -10,9 +10,14 @@ import {
   search,
   searchOutline,
 } from "ionicons/icons";
+import { useEffect } from "react";
 const HomeHeader = () => {
   const [opened, { toggle }] = useDisclosure();
+  const router = useIonRouter();
 
+  useEffect(() => {
+    console.log("window.scrollY", window.scrollY);
+  }, []);
   return (
     <>
       {" "}
@@ -24,7 +29,7 @@ const HomeHeader = () => {
         style={{ zIndex: 999999 }}
         h="60px"
         px={"sm"}
-        bg={darkThemebg}
+        bg={brandColor}
         align={"center"}
         // px="-10px"
       >
@@ -37,14 +42,15 @@ const HomeHeader = () => {
               Menu
             </Text>
           }
-        ></Drawer>
+        />
         <Flex justify={"space-between"} w="100%">
           <Avatar onClick={toggle} bg={brandColor}>
             JS
           </Avatar>
           <IonIcon
             icon={searchOutline}
-            style={{ fontSize: "25px", color: "white" }}
+            style={{ fontSize: "25px", color: "white", marginTop: "5px" }}
+            onClick={() => router.push("/search")}
           />
         </Flex>
         {/* <Burger

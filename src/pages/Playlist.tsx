@@ -1,6 +1,17 @@
-import { IonContent, IonIcon, IonRouterLink, useIonRouter } from "@ionic/react";
+import {
+  IonContent,
+  IonIcon,
+  IonPage,
+  IonRouterLink,
+  useIonRouter,
+} from "@ionic/react";
 import { useEffect, useState } from "react";
-import { darkThemebg, playlistTracks, reccomendations } from "../constants";
+import {
+  brandColor,
+  darkThemebg,
+  playlistTracks,
+  reccomendations,
+} from "../constants";
 import {
   BackgroundImage,
   Box,
@@ -20,8 +31,10 @@ import {
   shuffleOutline,
   shuffleSharp,
   play,
+  pause,
 } from "ionicons/icons";
 import MusicPlayer from "../components/MusicPlayer";
+import SingleTrack from "../components/SingleTrack";
 
 const Playlist = () => {
   const router = useIonRouter();
@@ -60,82 +73,92 @@ const Playlist = () => {
   // playlistTracks;
 
   return (
-    <IonContent fullscreen>
-      <Box style={{ backgroundColor: darkThemebg }}>
-        <Flex
-          style={{ zIndex: 9999 }}
-          pos="sticky"
-          bg={darkThemebg}
-          top={0}
-          py="md"
-          justify={"space-between"}
-          px="md"
-        >
-          <IonRouterLink href={"/home"}>
+    <IonPage>
+      <IonContent fullscreen>
+        <Box style={{ backgroundColor: darkThemebg }}>
+          <Flex
+            style={{ zIndex: 9999, backgroundColor: brandColor }}
+            pos="sticky"
+            top={0}
+            py="md"
+            justify={"space-between"}
+            px="md"
+          >
             <IonIcon
+              onClick={() =>
+                router.canGoBack() ? router.goBack() : router.push("/home")
+              }
               icon={arrowBackOutline}
               style={{ color: "white", fontSize: "20px" }}
             />
-          </IonRouterLink>
-          <IonRouterLink href={"/search"}>
             <IonIcon
+              onClick={() => {
+                router.push("/search");
+              }}
               icon={search}
-              style={{ color: "white", fontSize: "20px" }}
+              style={{ color: "white", fontSize: "20px", cursor: "pointer" }}
             />
-          </IonRouterLink>
-        </Flex>
-        <Center h="200">
-          <Image
-            style={{ borderRadius: "10px" }}
-            h="200"
-            w="200"
-            src={playlistInfo?.content?.items[0]?.images[0]?.url}
-          />
-        </Center>
-        <Text style={{ textAlign: "center", color: "white" }} pt="md" px="lg">
-          {playlistInfo?.content?.items[0]?.description}
-        </Text>
-        <Flex
-          pt="lg"
-          justify={"space-between"}
-          style={{ padding: "0px 20px", alignItems: "center" }}
-        >
-          <IonIcon
-            icon={shuffleOutline}
-            style={{ color: "white", fontSize: "35px" }}
-          ></IonIcon>
-          <IonIcon
-            icon={playCircle}
+          </Flex>
+          <Center
+            // h="200"
             style={{
-              color: "#1db954",
-              fontSize: "65px",
-              transition: "transform 0.2s ease-in-out",
-              //   transform: isHovered === i.id ? "scale(1.1)" : "scale(1)",
+              backgroundImage: `linear-gradient(180deg, ${brandColor},${darkThemebg},${darkThemebg})`,
+              flexDirection: "column",
             }}
-          ></IonIcon>
-        </Flex>
-        <Box px="lg" py="xl" pos={"relative"}>
-          {playlistTracks.items.map((i) => (
-            <Flex py="sm" align={"center"}>
-              <Image h="80" src={i.track.album.images[0].url} />
-              <Box style={{ color: "white", paddingLeft: "10px" }}>
-                <Text style={{ fontSize: "18px" }}>{i.track.album.name}</Text>
-                <Flex gap={5}>
-                  {i.track.album.artists.map((a, i, total) => (
-                    <>
-                      <Text style={{ fontSize: "14px", opacity: 0.5 }}>
-                        {a.name}
-                        {i === total.length - 1 ? "" : ","}
-                      </Text>
-                    </>
-                  ))}
-                </Flex>
-              </Box>
+          >
+            <Image
+              style={{
+                borderRadius: "10px",
+              }}
+              h="200"
+              w="200"
+              src={playlistInfo?.content?.items[0]?.images[0]?.url}
+            />
+            <Text
+              style={{
+                textAlign: "center",
+                color: "white",
+                fontSize: "14px",
+                fontStyle: "oblique",
+                opacity: "0.9",
+              }}
+              pt="md"
+              px="xl"
+            >
+              {playlistInfo?.content?.items[0]?.description}
+            </Text>
+            <Flex
+              w="100%"
+              pt="lg"
+              justify={"space-between"}
+              style={{ padding: "0px 20px", alignItems: "center" }}
+            >
+              <IonIcon
+                icon={shuffleOutline}
+                style={{ color: "white", fontSize: "35px" }}
+              ></IonIcon>
+              <IonIcon
+                icon={playCircle}
+                style={{
+                  color: brandColor,
+                  fontSize: "65px",
+                  transition: "transform 0.2s ease-in-out",
+                  transform: "scale(1)",
+                  ":hover": { transform: "scale(1.1)" },
+                  //   transform: isHovered === i.id ? "scale(1.1)" : "scale(1)",
+                }}
+              ></IonIcon>
             </Flex>
-          ))}
+          </Center>
+
+          <Box px="lg" py="xl" pos={"relative"}>
+            {playlistTracks.items.map((i) => (
+              <SingleTrack trackData={i} />
+            ))}
+          </Box>
         </Box>
-      </Box>
-    </IonContent>
+      </IonContent>
+    </IonPage>
   );
 };
 

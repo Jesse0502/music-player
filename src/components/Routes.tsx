@@ -29,7 +29,6 @@ import Playlist from "../pages/Playlist";
 
 const Footer = () => {
   const [currentTab, setCurrentTab] = useState("home");
-
   return (
     <>
       {/* <MusicPlayer /> */}
@@ -110,7 +109,7 @@ const Footer = () => {
           </IonTabBar>
         </IonTabs>
       </IonReactRouter>
-      <Box pos="absolute" bottom={60} h="max" w="100%" bg="white">
+      <Box pos="absolute" bottom={70} h="max" w="100%" bg="white">
         <MusicPlayer />
       </Box>
     </>

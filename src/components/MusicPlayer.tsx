@@ -65,7 +65,9 @@ const MusicPlayer = () => {
     })();
   }, []);
   return (
-    <Box display={isRefreshing ? "none" : "block"}>
+    <Box
+    // display={isRefreshing ? "none" : "block"}
+    >
       <SpotifyPlayer
         token={accessToken}
         layout="responsive"
