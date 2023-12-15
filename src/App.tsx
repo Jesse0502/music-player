@@ -49,7 +49,9 @@ import "@ionic/react/css/display.css";
 import "@mantine/core/styles.css";
 import { Box, MantineProvider, Text, createTheme } from "@mantine/core";
 import Routes from "./components/Routes";
-import AppHeader from "./components/AppHeader";
+import { createApi } from "@reduxjs/toolkit/query";
+import { store } from "./store/store";
+import { Provider } from "react-redux";
 
 setupIonicReact();
 const App: React.FC = () => {
@@ -75,11 +77,13 @@ const App: React.FC = () => {
   });
   return (
     <IonApp>
-      <MantineProvider theme={theme} defaultColorScheme="dark">
-        {/* <AppHeader /> */}
+      <Provider store={store}>
+        <MantineProvider theme={theme} defaultColorScheme="dark">
+          {/* <AppHeader /> */}
 
-        <Routes />
-      </MantineProvider>
+          <Routes />
+        </MantineProvider>
+      </Provider>
     </IonApp>
   );
 };

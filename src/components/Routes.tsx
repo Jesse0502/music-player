@@ -24,11 +24,33 @@ import Search from "../pages/Search";
 import Profile from "../pages/Profile";
 import { brandColor, darkThemebg } from "../constants";
 import MusicPlayer from "./MusicPlayer";
-import { Box, Flex, Text } from "@mantine/core";
+import { Alert, Box, Button, Center, Flex, Modal, Text } from "@mantine/core";
 import Playlist from "../pages/Playlist";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { sendGaySongWarning, togglePlayerRuntime } from "../store/playerSlice";
+import Artist from "../pages/Artist";
 
 const Footer = () => {
   const [currentTab, setCurrentTab] = useState("home");
+  const gaySongWarning = useSelector(
+    (state: RootState) => state.player.gaySongWarning
+  );
+  const playerSettings = useSelector(
+    (state: RootState) => state.player.playerSettings
+  );
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  useEffect(() => {
+    if (gaySongWarning) {
+      dispatch(togglePlayerRuntime(false));
+      setShowWarningModal(true);
+    }
+  }, [gaySongWarning]);
+  const dispatch = useDispatch();
+  const closeModal = () => {
+    setShowWarningModal(false);
+    dispatch(sendGaySongWarning(false));
+  };
   return (
     <>
       {/* <MusicPlayer /> */}
@@ -54,6 +76,9 @@ const Footer = () => {
             </Route>
             <Route exact path="/playlist/:id">
               <Playlist />
+            </Route>
+            <Route exact path="/artist/:id">
+              <Artist />
             </Route>
             <Route exact path="/">
               <Redirect to="/home" />
@@ -93,7 +118,14 @@ const Footer = () => {
               }}
               href="/search"
             >
-              <IonIcon aria-hidden="true" icon={search} />
+              <IonIcon
+                aria-hidden="true"
+                style={{
+                  background: darkThemebg,
+                  color: currentTab === "search" ? brandColor : "grey",
+                }}
+                icon={search}
+              />
             </IonTabButton>
             <IonTabButton
               mode="ios"
@@ -104,11 +136,19 @@ const Footer = () => {
               tab="profile"
               href="/profile"
             >
-              <IonIcon aria-hidden="true" icon={personCircle} />
+              <IonIcon
+                aria-hidden="true"
+                style={{
+                  background: darkThemebg,
+                  color: currentTab === "profile" ? brandColor : "grey",
+                }}
+                icon={personCircle}
+              />
             </IonTabButton>
           </IonTabBar>
         </IonTabs>
       </IonReactRouter>
+
       <Box pos="absolute" bottom={70} h="max" w="100%" bg="white">
         <MusicPlayer />
       </Box>

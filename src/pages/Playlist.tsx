@@ -1,10 +1,4 @@
-import {
-  IonContent,
-  IonIcon,
-  IonPage,
-  IonRouterLink,
-  useIonRouter,
-} from "@ionic/react";
+import { IonContent, IonIcon, IonPage, useIonRouter } from "@ionic/react";
 import { useEffect, useState } from "react";
 import {
   brandColor,
@@ -13,28 +7,23 @@ import {
   reccomendations,
 } from "../constants";
 import {
-  BackgroundImage,
   Box,
   Button,
   Center,
   Flex,
   Image,
+  Skeleton,
   Text,
 } from "@mantine/core";
 import {
   playCircle,
-  arrowBackCircle,
-  arrowBack,
   arrowBackOutline,
   search,
-  shuffle,
   shuffleOutline,
-  shuffleSharp,
-  play,
-  pause,
 } from "ionicons/icons";
-import MusicPlayer from "../components/MusicPlayer";
 import SingleTrack from "../components/SingleTrack";
+import { useDispatch } from "react-redux";
+import { addPlaylistToPlayer } from "../store/playerSlice";
 
 const Playlist = () => {
   const router = useIonRouter();
@@ -44,10 +33,12 @@ const Playlist = () => {
         i?.content?.items[0]?.id === router.routeInfo.pathname.split("/")[2]
     )
   );
+  const [playlistSongs, setPlaylistSongs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     (async () => {
       const playlistId = router.routeInfo.pathname.split("/")[2];
-      // const playlistInfo =
       const url =
         "https://spotify23.p.rapidapi.com/playlist_tracks/?id=" +
         playlistId +
@@ -55,22 +46,51 @@ const Playlist = () => {
       const options = {
         method: "GET",
         headers: {
-          "X-RapidAPI-Key":
-            "7c32b94251mshcddfc80855224dfp14b29ajsn2f1b6a3b5141",
+          "X-RapidAPI-Key": import.meta.env.VITE_X_RAPIDAPI_KEY,
           "X-RapidAPI-Host": "spotify23.p.rapidapi.com",
         },
       };
 
       try {
-        //   const response = await fetch(url, options);
-        //   const result = await response.text();
-        //   console.log(result);
+        const response = await fetch(url, options);
+        const result = await response.json();
+        setPlaylistSongs(result.items);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
     })();
   }, []);
-  // playlistTracks;
+
+  const getPlaylistInfo = async (playlistId: string) => {
+    const playlist = reccomendations.content.items.find(
+      (i) =>
+        i?.content?.items[0]?.id === router.routeInfo.pathname.split("/")[2]
+    );
+    if (playlist) return setPlaylistInfo(playlist);
+    const url = `https://spotify23.p.rapidapi.com/playlist/?id=${playlistId}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "X-RapidAPI-Key": import.meta.env.VITE_X_RAPIDAPI_KEY,
+        "X-RapidAPI-Host": "spotify23.p.rapidapi.com",
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const result = await response.json();
+      setPlaylistInfo(result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const dispatch = useDispatch();
+  const playPlaylist = () => {
+    const uris: string[] = playlistSongs?.map((a: any) => a.track.uri);
+    dispatch(addPlaylistToPlayer(uris));
+  };
 
   return (
     <IonPage>
@@ -139,12 +159,13 @@ const Playlist = () => {
               ></IonIcon>
               <IonIcon
                 icon={playCircle}
+                onClick={playPlaylist}
                 style={{
                   color: brandColor,
                   fontSize: "65px",
                   transition: "transform 0.2s ease-in-out",
                   transform: "scale(1)",
-                  ":hover": { transform: "scale(1.1)" },
+                  "&:hover": { transform: "scale(1.1)" },
                   //   transform: isHovered === i.id ? "scale(1.1)" : "scale(1)",
                 }}
               ></IonIcon>
@@ -152,9 +173,13 @@ const Playlist = () => {
           </Center>
 
           <Box px="lg" py="xl" pos={"relative"}>
-            {playlistTracks.items.map((i) => (
-              <SingleTrack trackData={i} />
-            ))}
+            {loading
+              ? Array.from({ length: 100 }).map((i) => (
+                  <Skeleton my="sm">
+                    <Box h="70" w="100%" />
+                  </Skeleton>
+                ))
+              : playlistSongs.map((i) => <SingleTrack trackData={i} />)}
           </Box>
         </Box>
       </IonContent>

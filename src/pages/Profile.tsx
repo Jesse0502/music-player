@@ -53,14 +53,19 @@ const Profile: React.FC = () => {
               px="lg"
               style={{ fontSize: "14px", textAlign: "center" }}
             >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut, sint
-              iusto corrupti adipisci obcaecati enim distinctio consectetur
-              culpa sapiente? Corporis dicta voluptate ipsum, saepe cupiditate,
-              eligendi consectetur et nostrum reiciendis, sed labore ipsa!
-              Aliquid ipsa repellat impedit adipisci ex exercitationem. Ab,
-              eveniet eos. Unde id facilis illum, pariatur maxime nemo!
+              Bless your heart now, honey! This app is for folks who appreciate
+              a good giggle and a touch of creativity, y'all hear? We ain't in
+              the business of hurtin' feelings, bless my buttons! We're like a
+              porch swing on a Sunday afternoon – just here to watch the world
+              go by and maybe share a few laughs along the way. Now, I know some
+              folks might get their feathers ruffled, but that's just life,
+              ain't it? We can't all be sugar and spice and nothin' twice. But
+              don't you fret, darlin'! Just remember, this app's like a glass of
+              sweet tea – best enjoyed cold and with a whole lotta kindness. So
+              pour yourself a glass, put on your dancin' shoes, and let's have a
+              hootenanny without steppin' on any toes, okay?
             </Text>
-            <Button mt="lg">Logout</Button>
+            {/* <Button mt="lg">Logout</Button> */}
           </Center>
         </Box>
       </IonContent>
